@@ -1,10 +1,3 @@
-//
-//  ContentView.swift
-//  MenuBarTimer
-//
-//  Created by Daniel on 07/06/2024.
-//
-
 import SwiftUI
 
 struct ContentView: View {
@@ -17,8 +10,4 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
     }
-}
-
-#Preview {
-    ContentView()
 }

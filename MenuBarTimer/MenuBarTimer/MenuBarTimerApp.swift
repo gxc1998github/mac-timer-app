@@ -1,9 +1,3 @@
-//
-//  MenuBarTimerApp.swift
-//  MenuBarTimer
-//
-//  Created by Daniel on 07/06/2024.
-//
 import SwiftUI
 
 @main

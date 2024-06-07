@@ -15,6 +15,8 @@
 		65CE2DCF2C132BC8006A9C1C /* MenuBarTimerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CE2DCE2C132BC8006A9C1C /* MenuBarTimerUITests.swift */; };
 		65CE2DD12C132BC8006A9C1C /* MenuBarTimerUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CE2DD02C132BC8006A9C1C /* MenuBarTimerUITestsLaunchTests.swift */; };
 		65CE2DDE2C132BF4006A9C1C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CE2DDD2C132BF4006A9C1C /* AppDelegate.swift */; };
+		65CE2DE22C133322006A9C1C /* rainstick.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 65CE2DE12C133322006A9C1C /* rainstick.mp3 */; };
+		65CE2DE32C13398C006A9C1C /* rainstick.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 65CE2DE12C133322006A9C1C /* rainstick.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +49,7 @@
 		65CE2DCE2C132BC8006A9C1C /* MenuBarTimerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarTimerUITests.swift; sourceTree = "<group>"; };
 		65CE2DD02C132BC8006A9C1C /* MenuBarTimerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarTimerUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		65CE2DDD2C132BF4006A9C1C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		65CE2DE12C133322006A9C1C /* rainstick.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = rainstick.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,6 +105,7 @@
 				65CE2DB42C132BC7006A9C1C /* ContentView.swift */,
 				65CE2DB62C132BC8006A9C1C /* Assets.xcassets */,
 				65CE2DBB2C132BC8006A9C1C /* MenuBarTimer.entitlements */,
+				65CE2DE12C133322006A9C1C /* rainstick.mp3 */,
 				65CE2DB82C132BC8006A9C1C /* Preview Content */,
 			);
 			path = MenuBarTimer;
@@ -238,6 +242,7 @@
 			files = (
 				65CE2DBA2C132BC8006A9C1C /* Preview Assets.xcassets in Resources */,
 				65CE2DB72C132BC8006A9C1C /* Assets.xcassets in Resources */,
+				65CE2DE32C13398C006A9C1C /* rainstick.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -252,6 +257,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65CE2DE22C133322006A9C1C /* rainstick.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
