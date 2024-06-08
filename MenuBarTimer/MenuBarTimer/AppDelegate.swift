@@ -200,11 +200,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
     @objc func updateTimer() {
         if timeRemaining > 0 {
             timeRemaining -= 1
-            let minutes = Int(timeRemaining) / 60
+            let hours = Int(timeRemaining) / 3600
+            let minutes = (Int(timeRemaining) % 3600) / 60
             let seconds = Int(timeRemaining) % 60
+            
             if let button = statusItem.button {
                 button.image = nil // Remove the icon
-                button.title = String(format: "%02d:%02d", minutes, seconds)
+                if hours > 0 {
+                    button.title = String(format: "%d:%02d:%02d", hours, minutes, seconds)
+                } else {
+                    button.title = String(format: "%02d:%02d", minutes, seconds)
+                }
             }
         } else {
             timer?.invalidate()
