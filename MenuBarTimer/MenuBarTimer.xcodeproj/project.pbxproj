@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		65CE2DB32C132BC7006A9C1C /* MenuBarTimerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CE2DB22C132BC7006A9C1C /* MenuBarTimerApp.swift */; };
-		65CE2DB52C132BC7006A9C1C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CE2DB42C132BC7006A9C1C /* ContentView.swift */; };
 		65CE2DB72C132BC8006A9C1C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65CE2DB62C132BC8006A9C1C /* Assets.xcassets */; };
 		65CE2DBA2C132BC8006A9C1C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65CE2DB92C132BC8006A9C1C /* Preview Assets.xcassets */; };
 		65CE2DC52C132BC8006A9C1C /* MenuBarTimerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CE2DC42C132BC8006A9C1C /* MenuBarTimerTests.swift */; };
@@ -40,7 +39,6 @@
 /* Begin PBXFileReference section */
 		65CE2DAF2C132BC7006A9C1C /* MenuBarTimer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MenuBarTimer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		65CE2DB22C132BC7006A9C1C /* MenuBarTimerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarTimerApp.swift; sourceTree = "<group>"; };
-		65CE2DB42C132BC7006A9C1C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		65CE2DB62C132BC8006A9C1C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		65CE2DB92C132BC8006A9C1C /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		65CE2DBB2C132BC8006A9C1C /* MenuBarTimer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MenuBarTimer.entitlements; sourceTree = "<group>"; };
@@ -104,7 +102,6 @@
 			children = (
 				65CE2DDD2C132BF4006A9C1C /* AppDelegate.swift */,
 				65CE2DB22C132BC7006A9C1C /* MenuBarTimerApp.swift */,
-				65CE2DB42C132BC7006A9C1C /* ContentView.swift */,
 				65D5155B2C13FCE2001C66FE /* EventMonitor.swift */,
 				65CE2DE12C133322006A9C1C /* rainstick.mp3 */,
 				65CE2DB62C132BC8006A9C1C /* Assets.xcassets */,
@@ -272,7 +269,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				65CE2DDE2C132BF4006A9C1C /* AppDelegate.swift in Sources */,
-				65CE2DB52C132BC7006A9C1C /* ContentView.swift in Sources */,
 				65CE2DB32C132BC7006A9C1C /* MenuBarTimerApp.swift in Sources */,
 				65D5155C2C13FCE2001C66FE /* EventMonitor.swift in Sources */,
 			);
