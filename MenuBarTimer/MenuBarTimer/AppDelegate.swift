@@ -126,21 +126,25 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
     }
     
     @objc func setTimerToFiveSeconds() {
+        selectedTime = 5 / 60.0 // Update selectedTime to match the button's value in minutes
         timeRemaining = 5 // 5 seconds
         startTimer()
     }
     
     @objc func setTimerToFiveMinutes() {
+        selectedTime = 5.0 // Update selectedTime to match the button's value in minutes
         timeRemaining = 300 // 5 minutes in seconds
         startTimer()
     }
     
     @objc func setTimerToTenMinutes() {
+        selectedTime = 10.0 // Update selectedTime to match the button's value in minutes
         timeRemaining = 600 // 10 minutes in seconds
         startTimer()
     }
     
     @objc func setTimerToTwentyMinutes() {
+        selectedTime = 20.0 // Update selectedTime to match the button's value in minutes
         timeRemaining = 1200 // 20 minutes in seconds
         startTimer()
     }
@@ -164,6 +168,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
             tenMinutesMenuItem.isHidden = true
             twentyMinutesMenuItem.isHidden = true
             sliderMenuItem.isHidden = true
+            // Clear the icon when the timer starts
+            if let button = statusItem.button {
+                button.image = nil
+            }
         }
     }
     
