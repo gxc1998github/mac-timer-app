@@ -45,7 +45,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
     func setupStatusItem() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem.button {
-            button.title = "⏱️"
+            if let image = NSImage(named: "icon") { // Ensure the image name matches the one in Assets.xcassets
+                image.isTemplate = true // This makes the image adapt to the menu bar's light/dark mode
+                
+                // Resize the image to a smaller size
+                let resizedImage = NSImage(size: NSSize(width: 18, height: 18))
+                resizedImage.lockFocus()
+                image.draw(in: NSRect(x: 0, y: 0, width: 18, height: 18))
+                resizedImage.unlockFocus()
+                
+                button.image = resizedImage
+                button.imageScaling = .scaleProportionallyDown // Ensures the image scales down proportionally
+            } else {
+                print("Icon image not found")
+            }
         }
     }
     
@@ -168,18 +181,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         isTimerRunning = false
         isTimerPaused = false
         timeRemaining = 0
-        if let button = statusItem.button {
-            button.title = "⏱️"
-        }
-        startMenuItem.isHidden = false
-        pauseMenuItem.isHidden = true
-        resetMenuItem.isHidden = true
-        stopMenuItem.isHidden = true
-        fiveSecondsMenuItem.isHidden = false
-        fiveMinutesMenuItem.isHidden = false
-        tenMinutesMenuItem.isHidden = false
-        twentyMinutesMenuItem.isHidden = false
-        sliderMenuItem.isHidden = false
+        resetToOriginalState()
     }
     
     @objc func updateTimer() {
@@ -188,13 +190,24 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
             let minutes = Int(timeRemaining) / 60
             let seconds = Int(timeRemaining) % 60
             if let button = statusItem.button {
+                button.image = nil // Remove the icon
                 button.title = String(format: "%02d:%02d", minutes, seconds)
             }
         } else {
             timer?.invalidate()
             isTimerRunning = false
             if let button = statusItem.button {
-                button.title = "⏱️ Done!"
+                button.title = "" // Clear the title
+                if let image = NSImage(named: "icon") {
+                    image.isTemplate = true
+                    // Resize the image to a smaller size
+                    let resizedImage = NSImage(size: NSSize(width: 18, height: 18))
+                    resizedImage.lockFocus()
+                    image.draw(in: NSRect(x: 0, y: 0, width: 18, height: 18))
+                    resizedImage.unlockFocus()
+                    button.image = resizedImage
+                    button.imageScaling = .scaleProportionallyDown // Ensures the image scales down proportionally
+                }
             }
             audioPlayer?.play()
             startMenuItem.isHidden = true
@@ -216,9 +229,24 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
     
     func resetToOriginalState() {
         if let button = statusItem.button {
-            button.title = "⏱️"
+            button.title = "" // Clear the title
+            if let image = NSImage(named: "icon") {
+                image.isTemplate = true
+                // Resize the image to a smaller size
+                let resizedImage = NSImage(size: NSSize(width: 18, height: 18))
+                resizedImage.lockFocus()
+                image.draw(in: NSRect(x: 0, y: 0, width: 18, height: 18))
+                resizedImage.unlockFocus()
+                button.image = resizedImage
+                button.imageScaling = .scaleProportionallyDown // Ensures the image scales down proportionally
+            }
         }
         stopMenuItem.isHidden = true
         startMenuItem.isHidden = false
+        fiveSecondsMenuItem.isHidden = false
+        fiveMinutesMenuItem.isHidden = false
+        tenMinutesMenuItem.isHidden = false
+        twentyMinutesMenuItem.isHidden = false
+        sliderMenuItem.isHidden = false
     }
 }
