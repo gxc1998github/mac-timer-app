@@ -1,5 +1,6 @@
 import Cocoa
 import AVFoundation
+import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
     
@@ -8,6 +9,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
     var timeRemaining: TimeInterval = 0 // Default to 0
     var isTimerRunning = false
     var audioPlayer: AVAudioPlayer?
+    var popover: NSPopover!
+    var eventMonitor: EventMonitor?
+    
+    // Menu items
     var startMenuItem: NSMenuItem!
     var pauseMenuItem: NSMenuItem!
     var resetMenuItem: NSMenuItem!
@@ -18,9 +23,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
     var tenMinutesMenuItem: NSMenuItem!
     var twentyMinutesMenuItem: NSMenuItem!
     var selectedTime: Double = 0.0
-
+    
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Load the sound file
+        setupAudioPlayer()
+        setupStatusItem()
+        setupPopover()
+        setupMenu()
+        setupEventMonitor()
+    }
+    
+    func setupAudioPlayer() {
         if let soundURL = Bundle.main.url(forResource: "rainstick", withExtension: "mp3") {
             do {
                 audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
@@ -32,14 +44,24 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         } else {
             print("Sound file not found")
         }
-        
-        // Create the status item
+    }
+    
+    func setupStatusItem() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem.button {
             button.title = "⏱️"
+            button.action = #selector(togglePopover(_:))
         }
-        
-        // Create the menu
+    }
+    
+    func setupPopover() {
+        popover = NSPopover()
+        popover.contentSize = NSSize(width: 300, height: 200)
+        popover.behavior = .transient
+        popover.contentViewController = NSHostingController(rootView: ContentView())
+    }
+    
+    func setupMenu() {
         let menu = NSMenu()
         fiveSecondsMenuItem = NSMenuItem(title: "5 Seconds", action: #selector(setTimerToFiveSeconds), keyEquivalent: "")
         fiveMinutesMenuItem = NSMenuItem(title: "5 Minutes", action: #selector(setTimerToFiveMinutes), keyEquivalent: "")
@@ -56,7 +78,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         pauseMenuItem = NSMenuItem(title: "Pause", action: #selector(pauseTimer), keyEquivalent: "")
         resetMenuItem = NSMenuItem(title: "Reset", action: #selector(resetTimer), keyEquivalent: "")
         stopMenuItem = NSMenuItem(title: "Stop", action: #selector(stopSound), keyEquivalent: "")
-
+        
         menu.addItem(startMenuItem)
         menu.addItem(pauseMenuItem)
         menu.addItem(resetMenuItem)
@@ -69,7 +91,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         
         menu.addItem(NSMenuItem.separator())
         
-        // Create the slider
         let sliderView = NSSlider(value: selectedTime, minValue: 0, maxValue: 120, target: self, action: #selector(sliderValueChanged(_:)))
         sliderView.frame.size = CGSize(width: 200, height: 20)
         sliderMenuItem = NSMenuItem()
@@ -80,6 +101,34 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "Q"))
         
         statusItem.menu = menu
+    }
+    
+    func setupEventMonitor() {
+        eventMonitor = EventMonitor(mask: [.leftMouseDown, .rightMouseDown]) { [weak self] event in
+            if let strongSelf = self, strongSelf.popover.isShown {
+                strongSelf.closePopover(event)
+            }
+        }
+    }
+    
+    @objc func togglePopover(_ sender: Any?) {
+        if popover.isShown {
+            closePopover(sender)
+        } else {
+            showPopover(sender)
+        }
+    }
+    
+    func showPopover(_ sender: Any?) {
+        if let button = statusItem.button {
+            popover.show(relativeTo: button.bounds, of: button, preferredEdge: NSRectEdge.minY)
+            eventMonitor?.start()
+        }
+    }
+    
+    func closePopover(_ sender: Any?) {
+        popover.performClose(sender)
+        eventMonitor?.stop()
     }
     
     @objc func setTimerToFiveSeconds() {
@@ -101,12 +150,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         timeRemaining = 1200 // 20 minutes in seconds
         startTimer()
     }
-
+    
     @objc func sliderValueChanged(_ sender: NSSlider) {
         selectedTime = sender.doubleValue
         startMenuItem.isEnabled = selectedTime > 0
     }
-
+    
     @objc func startTimer() {
         if !isTimerRunning {
             if selectedTime > 0 {
@@ -150,7 +199,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         twentyMinutesMenuItem.isHidden = false
         sliderMenuItem.isHidden = false
     }
-
+    
     @objc func updateTimer() {
         if timeRemaining > 0 {
             timeRemaining -= 1
@@ -177,12 +226,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
             sliderMenuItem.isHidden = true
         }
     }
-
+    
     @objc func stopSound() {
         audioPlayer?.stop()
         resetToOriginalState()
     }
-
+    
     func resetToOriginalState() {
         if let button = statusItem.button {
             button.title = "⏱️"
@@ -195,7 +244,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         twentyMinutesMenuItem.isHidden = false
         sliderMenuItem.isHidden = false
     }
-
+    
     // AVAudioPlayerDelegate method
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         resetToOriginalState()

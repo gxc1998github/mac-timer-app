@@ -17,6 +17,7 @@
 		65CE2DDE2C132BF4006A9C1C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CE2DDD2C132BF4006A9C1C /* AppDelegate.swift */; };
 		65CE2DE22C133322006A9C1C /* rainstick.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 65CE2DE12C133322006A9C1C /* rainstick.mp3 */; };
 		65CE2DE32C13398C006A9C1C /* rainstick.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 65CE2DE12C133322006A9C1C /* rainstick.mp3 */; };
+		65D5155C2C13FCE2001C66FE /* EventMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D5155B2C13FCE2001C66FE /* EventMonitor.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,6 +51,7 @@
 		65CE2DD02C132BC8006A9C1C /* MenuBarTimerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarTimerUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		65CE2DDD2C132BF4006A9C1C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		65CE2DE12C133322006A9C1C /* rainstick.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = rainstick.mp3; sourceTree = "<group>"; };
+		65D5155B2C13FCE2001C66FE /* EventMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMonitor.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,9 +105,10 @@
 				65CE2DDD2C132BF4006A9C1C /* AppDelegate.swift */,
 				65CE2DB22C132BC7006A9C1C /* MenuBarTimerApp.swift */,
 				65CE2DB42C132BC7006A9C1C /* ContentView.swift */,
+				65D5155B2C13FCE2001C66FE /* EventMonitor.swift */,
+				65CE2DE12C133322006A9C1C /* rainstick.mp3 */,
 				65CE2DB62C132BC8006A9C1C /* Assets.xcassets */,
 				65CE2DBB2C132BC8006A9C1C /* MenuBarTimer.entitlements */,
-				65CE2DE12C133322006A9C1C /* rainstick.mp3 */,
 				65CE2DB82C132BC8006A9C1C /* Preview Content */,
 			);
 			path = MenuBarTimer;
@@ -271,6 +274,7 @@
 				65CE2DDE2C132BF4006A9C1C /* AppDelegate.swift in Sources */,
 				65CE2DB52C132BC7006A9C1C /* ContentView.swift in Sources */,
 				65CE2DB32C132BC7006A9C1C /* MenuBarTimerApp.swift in Sources */,
+				65D5155C2C13FCE2001C66FE /* EventMonitor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -437,6 +441,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"MenuBarTimer/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -462,6 +467,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"MenuBarTimer/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
