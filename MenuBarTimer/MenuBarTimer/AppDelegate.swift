@@ -1,5 +1,4 @@
 import Cocoa
-import SwiftUI
 import AVFoundation
 
 class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
@@ -13,12 +12,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
     var pauseMenuItem: NSMenuItem!
     var resetMenuItem: NSMenuItem!
     var stopMenuItem: NSMenuItem!
-    var customTimeTextField: NSTextField!
+    var sliderMenuItem: NSMenuItem!
     var fiveSecondsMenuItem: NSMenuItem!
     var fiveMinutesMenuItem: NSMenuItem!
     var tenMinutesMenuItem: NSMenuItem!
     var twentyMinutesMenuItem: NSMenuItem!
-    var customTimeItem: NSMenuItem!
+    var selectedTime: Double = 0.0
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Load the sound file
@@ -70,12 +69,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         
         menu.addItem(NSMenuItem.separator())
         
-        customTimeItem = NSMenuItem(title: "Custom Time (mins):", action: nil, keyEquivalent: "")
-        customTimeTextField = NSTextField(frame: NSRect(x: 0, y: 0, width: 100, height: 24))
-        customTimeTextField.action = #selector(customTimeChanged)
-        customTimeTextField.target = self
-        customTimeItem.view = customTimeTextField
-        menu.addItem(customTimeItem)
+        // Create the slider
+        let sliderView = NSSlider(value: selectedTime, minValue: 0, maxValue: 120, target: self, action: #selector(sliderValueChanged(_:)))
+        sliderView.frame.size = CGSize(width: 200, height: 20)
+        sliderMenuItem = NSMenuItem()
+        sliderMenuItem.view = sliderView
+        menu.addItem(sliderMenuItem)
         
         menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "Q"))
@@ -103,16 +102,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         startTimer()
     }
 
-    @objc func customTimeChanged() {
-        if let customTime = TimeInterval(customTimeTextField.stringValue), customTime > 0 {
-            startMenuItem.isEnabled = true
-        } else {
-            startMenuItem.isEnabled = false
-        }
+    @objc func sliderValueChanged(_ sender: NSSlider) {
+        selectedTime = sender.doubleValue
+        startMenuItem.isEnabled = selectedTime > 0
     }
-    
+
     @objc func startTimer() {
         if !isTimerRunning {
+            if selectedTime > 0 {
+                timeRemaining = selectedTime * 60 // Convert minutes to seconds
+            }
             isTimerRunning = true
             timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
             startMenuItem.isHidden = true
@@ -122,7 +121,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
             fiveMinutesMenuItem.isHidden = true
             tenMinutesMenuItem.isHidden = true
             twentyMinutesMenuItem.isHidden = true
-            customTimeItem.isHidden = true
+            sliderMenuItem.isHidden = true
         }
     }
     
@@ -149,7 +148,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         fiveMinutesMenuItem.isHidden = false
         tenMinutesMenuItem.isHidden = false
         twentyMinutesMenuItem.isHidden = false
-        customTimeItem.isHidden = false
+        sliderMenuItem.isHidden = false
     }
 
     @objc func updateTimer() {
@@ -175,7 +174,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
             fiveMinutesMenuItem.isHidden = true
             tenMinutesMenuItem.isHidden = true
             twentyMinutesMenuItem.isHidden = true
-            customTimeItem.isHidden = true
+            sliderMenuItem.isHidden = true
         }
     }
 
@@ -194,7 +193,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         fiveMinutesMenuItem.isHidden = false
         tenMinutesMenuItem.isHidden = false
         twentyMinutesMenuItem.isHidden = false
-        customTimeItem.isHidden = false
+        sliderMenuItem.isHidden = false
     }
 
     // AVAudioPlayerDelegate method
