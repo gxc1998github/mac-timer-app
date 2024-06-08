@@ -26,6 +26,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         setupAudioPlayer()
         setupStatusItem()
         setupMenu()
+        resetToOriginalState()
     }
     
     func setupAudioPlayer() {
@@ -40,6 +41,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         } else {
             print("Sound file not found")
         }
+    }
+    
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        resetToOriginalState()
     }
     
     func setupStatusItem() {
