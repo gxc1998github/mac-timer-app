@@ -1,6 +1,7 @@
 import Cocoa
 import SwiftUI
 import AVFoundation
+import ServiceManagement
 
 class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
     var statusItem: NSStatusItem!
@@ -28,6 +29,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         setupMenu()
         resetToOriginalState()
     }
+
     
     func setupAudioPlayer() {
         if let soundURL = Bundle.main.url(forResource: "rainstick", withExtension: "mp3") {
@@ -109,7 +111,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         
         // Create and add the label
         timeLabel = NSTextField(labelWithString: "\(Int(selectedTime)) min")
-        timeLabel.frame = NSRect(x: 150, y: 0, width: 80, height: 30) // Adjusted x position and width for the label
+        timeLabel.frame = NSRect(x: 170, y: 0, width: 70, height: 30) // Adjusted x position and width for the label
         timeLabel.alignment = .right
         sliderContainer.addSubview(timeLabel)
         
@@ -208,7 +210,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
                 button.image = nil // Remove the icon
                 if hours > 0 {
                     button.title = String(format: "%d:%02d:%02d", hours, minutes, seconds)
-                } else {
+                }
+                else {
                     button.title = String(format: "%02d:%02d", minutes, seconds)
                 }
             }
@@ -262,6 +265,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         }
         stopMenuItem.isHidden = true
         startMenuItem.isHidden = false
+        pauseMenuItem.isHidden = true // Ensure the pause button is hidden
+        resetMenuItem.isHidden = true // Ensure the reset button is hidden
         fiveSecondsMenuItem.isHidden = false
         fiveMinutesMenuItem.isHidden = false
         tenMinutesMenuItem.isHidden = false
