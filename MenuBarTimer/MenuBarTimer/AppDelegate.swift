@@ -1,18 +1,16 @@
 import Cocoa
-import AVFoundation
 import SwiftUI
+import AVFoundation
 
 class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
-    
     var statusItem: NSStatusItem!
     var timer: Timer?
     var timeRemaining: TimeInterval = 0 // Default to 0
     var isTimerRunning = false
     var audioPlayer: AVAudioPlayer?
-    var popover: NSPopover!
-    var eventMonitor: EventMonitor?
-    
-    // Menu items
+    var selectedTime: Double = 0.0
+    var timeLabel: NSTextField!
+
     var startMenuItem: NSMenuItem!
     var pauseMenuItem: NSMenuItem!
     var resetMenuItem: NSMenuItem!
@@ -22,15 +20,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
     var fiveMinutesMenuItem: NSMenuItem!
     var tenMinutesMenuItem: NSMenuItem!
     var twentyMinutesMenuItem: NSMenuItem!
-    var selectedTime: Double = 0.0
-    
+
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         setupAudioPlayer()
         setupStatusItem()
-        setupPopover()
         setupMenu()
-        setupEventMonitor()
     }
+
     
     func setupAudioPlayer() {
         if let soundURL = Bundle.main.url(forResource: "rainstick", withExtension: "mp3") {
@@ -46,91 +42,76 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         }
     }
     
+    
     func setupStatusItem() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem.button {
             button.title = "⏱️"
-            button.action = #selector(togglePopover(_:))
         }
     }
-    
-    func setupPopover() {
-        popover = NSPopover()
-        popover.contentSize = NSSize(width: 300, height: 200)
-        popover.behavior = .transient
-        popover.contentViewController = NSHostingController(rootView: ContentView())
-    }
+
     
     func setupMenu() {
         let menu = NSMenu()
+
+        // Add predefined time menu items
         fiveSecondsMenuItem = NSMenuItem(title: "5 Seconds", action: #selector(setTimerToFiveSeconds), keyEquivalent: "")
         fiveMinutesMenuItem = NSMenuItem(title: "5 Minutes", action: #selector(setTimerToFiveMinutes), keyEquivalent: "")
         tenMinutesMenuItem = NSMenuItem(title: "10 Minutes", action: #selector(setTimerToTenMinutes), keyEquivalent: "")
         twentyMinutesMenuItem = NSMenuItem(title: "20 Minutes", action: #selector(setTimerToTwentyMinutes), keyEquivalent: "")
-        
+
         menu.addItem(fiveSecondsMenuItem)
         menu.addItem(fiveMinutesMenuItem)
         menu.addItem(tenMinutesMenuItem)
         menu.addItem(twentyMinutesMenuItem)
         menu.addItem(NSMenuItem.separator())
-        
+
+        // Add start, pause, reset, and stop menu items
         startMenuItem = NSMenuItem(title: "Start", action: #selector(startTimer), keyEquivalent: "")
         pauseMenuItem = NSMenuItem(title: "Pause", action: #selector(pauseTimer), keyEquivalent: "")
         resetMenuItem = NSMenuItem(title: "Reset", action: #selector(resetTimer), keyEquivalent: "")
         stopMenuItem = NSMenuItem(title: "Stop", action: #selector(stopSound), keyEquivalent: "")
-        
+
         menu.addItem(startMenuItem)
         menu.addItem(pauseMenuItem)
         menu.addItem(resetMenuItem)
         menu.addItem(stopMenuItem)
-        
+
         pauseMenuItem.isHidden = true
         resetMenuItem.isHidden = true
         stopMenuItem.isHidden = true
         startMenuItem.isEnabled = false // Initially disable the start button
-        
+
         menu.addItem(NSMenuItem.separator())
-        
+
+        // Create the slider and label container
+        let sliderItem = NSMenuItem()
+        let sliderContainer = NSView(frame: NSRect(x: 0, y: 0, width: 300, height: 30)) // CONTAINER AREA FOR SLIDER OBJ
         let sliderView = NSSlider(value: selectedTime, minValue: 0, maxValue: 120, target: self, action: #selector(sliderValueChanged(_:)))
-        sliderView.frame.size = CGSize(width: 200, height: 20)
-        sliderMenuItem = NSMenuItem()
-        sliderMenuItem.view = sliderView
-        menu.addItem(sliderMenuItem)
+        sliderView.frame = NSRect(x: 10, y: 0, width: 150, height: 30) // SLIDER OBJ
+        sliderContainer.addSubview(sliderView)
         
+        // Create and add the label
+        timeLabel = NSTextField(labelWithString: "\(Int(selectedTime)) min")
+        timeLabel.frame = NSRect(x: 180, y: 0, width: 40, height: 30) // TIME LABEL OBJ
+        timeLabel.alignment = .right
+        sliderContainer.addSubview(timeLabel)
+        
+        sliderItem.view = sliderContainer
+        menu.addItem(sliderItem)
+
         menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "Q"))
-        
+
         statusItem.menu = menu
     }
     
-    func setupEventMonitor() {
-        eventMonitor = EventMonitor(mask: [.leftMouseDown, .rightMouseDown]) { [weak self] event in
-            if let strongSelf = self, strongSelf.popover.isShown {
-                strongSelf.closePopover(event)
-            }
-        }
+    @objc func sliderValueChanged(_ sender: NSSlider) {
+        selectedTime = sender.doubleValue
+        timeLabel.stringValue = "\(Int(selectedTime)) min"
+        startMenuItem.isEnabled = selectedTime > 0
     }
-    
-    @objc func togglePopover(_ sender: Any?) {
-        if popover.isShown {
-            closePopover(sender)
-        } else {
-            showPopover(sender)
-        }
-    }
-    
-    func showPopover(_ sender: Any?) {
-        if let button = statusItem.button {
-            popover.show(relativeTo: button.bounds, of: button, preferredEdge: NSRectEdge.minY)
-            eventMonitor?.start()
-        }
-    }
-    
-    func closePopover(_ sender: Any?) {
-        popover.performClose(sender)
-        eventMonitor?.stop()
-    }
-    
+        
     @objc func setTimerToFiveSeconds() {
         timeRemaining = 5 // 5 seconds
         startTimer()
@@ -151,10 +132,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         startTimer()
     }
     
-    @objc func sliderValueChanged(_ sender: NSSlider) {
-        selectedTime = sender.doubleValue
-        startMenuItem.isEnabled = selectedTime > 0
-    }
     
     @objc func startTimer() {
         if !isTimerRunning {
@@ -231,6 +208,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         audioPlayer?.stop()
         resetToOriginalState()
     }
+    
     
     func resetToOriginalState() {
         if let button = statusItem.button {
