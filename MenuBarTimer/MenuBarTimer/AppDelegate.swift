@@ -1,18 +1,17 @@
 import Cocoa
-import AVFoundation
 import SwiftUI
+import AVFoundation
 
 class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
-    
     var statusItem: NSStatusItem!
     var timer: Timer?
     var timeRemaining: TimeInterval = 0 // Default to 0
     var isTimerRunning = false
+    var isTimerPaused = false
     var audioPlayer: AVAudioPlayer?
-    var popover: NSPopover!
-    var eventMonitor: EventMonitor?
+    var selectedTime: Double = 0.0
+    var timeLabel: NSTextField!
     
-    // Menu items
     var startMenuItem: NSMenuItem!
     var pauseMenuItem: NSMenuItem!
     var resetMenuItem: NSMenuItem!
@@ -22,14 +21,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
     var fiveMinutesMenuItem: NSMenuItem!
     var tenMinutesMenuItem: NSMenuItem!
     var twentyMinutesMenuItem: NSMenuItem!
-    var selectedTime: Double = 0.0
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         setupAudioPlayer()
         setupStatusItem()
-        setupPopover()
         setupMenu()
-        setupEventMonitor()
     }
     
     func setupAudioPlayer() {
@@ -49,20 +45,27 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
     func setupStatusItem() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem.button {
-            button.title = "⏱️"
-            button.action = #selector(togglePopover(_:))
+            if let image = NSImage(named: "icon") { // Ensure the image name matches the one in Assets.xcassets
+                image.isTemplate = true // This makes the image adapt to the menu bar's light/dark mode
+                
+                // Resize the image to a smaller size
+                let resizedImage = NSImage(size: NSSize(width: 18, height: 18))
+                resizedImage.lockFocus()
+                image.draw(in: NSRect(x: 0, y: 0, width: 18, height: 18))
+                resizedImage.unlockFocus()
+                
+                button.image = resizedImage
+                button.imageScaling = .scaleProportionallyDown // Ensures the image scales down proportionally
+            } else {
+                print("Icon image not found")
+            }
         }
-    }
-    
-    func setupPopover() {
-        popover = NSPopover()
-        popover.contentSize = NSSize(width: 300, height: 200)
-        popover.behavior = .transient
-        popover.contentViewController = NSHostingController(rootView: ContentView())
     }
     
     func setupMenu() {
         let menu = NSMenu()
+        
+        // Add predefined time menu items
         fiveSecondsMenuItem = NSMenuItem(title: "5 Seconds", action: #selector(setTimerToFiveSeconds), keyEquivalent: "")
         fiveMinutesMenuItem = NSMenuItem(title: "5 Minutes", action: #selector(setTimerToFiveMinutes), keyEquivalent: "")
         tenMinutesMenuItem = NSMenuItem(title: "10 Minutes", action: #selector(setTimerToTenMinutes), keyEquivalent: "")
@@ -74,6 +77,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         menu.addItem(twentyMinutesMenuItem)
         menu.addItem(NSMenuItem.separator())
         
+        // Add start, pause, reset, and stop menu items
         startMenuItem = NSMenuItem(title: "Start", action: #selector(startTimer), keyEquivalent: "")
         pauseMenuItem = NSMenuItem(title: "Pause", action: #selector(pauseTimer), keyEquivalent: "")
         resetMenuItem = NSMenuItem(title: "Reset", action: #selector(resetTimer), keyEquivalent: "")
@@ -91,11 +95,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         
         menu.addItem(NSMenuItem.separator())
         
+        // Create the slider and label container
+        let sliderItem = NSMenuItem()
+        let sliderContainer = NSView(frame: NSRect(x: 0, y: 0, width: 250, height: 30)) // Updated width to 250
         let sliderView = NSSlider(value: selectedTime, minValue: 0, maxValue: 120, target: self, action: #selector(sliderValueChanged(_:)))
-        sliderView.frame.size = CGSize(width: 200, height: 20)
-        sliderMenuItem = NSMenuItem()
-        sliderMenuItem.view = sliderView
-        menu.addItem(sliderMenuItem)
+        sliderView.frame = NSRect(x: 10, y: 0, width: 150, height: 30) // Adjusted width for the slider
+        sliderContainer.addSubview(sliderView)
+        
+        // Create and add the label
+        timeLabel = NSTextField(labelWithString: "\(Int(selectedTime)) min")
+        timeLabel.frame = NSRect(x: 150, y: 0, width: 80, height: 30) // Adjusted x position and width for the label
+        timeLabel.alignment = .right
+        sliderContainer.addSubview(timeLabel)
+        
+        sliderItem.view = sliderContainer
+        menu.addItem(sliderItem)
+        // Initialize sliderMenuItem to avoid nil error
+        sliderMenuItem = sliderItem
         
         menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "Q"))
@@ -103,32 +119,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         statusItem.menu = menu
     }
     
-    func setupEventMonitor() {
-        eventMonitor = EventMonitor(mask: [.leftMouseDown, .rightMouseDown]) { [weak self] event in
-            if let strongSelf = self, strongSelf.popover.isShown {
-                strongSelf.closePopover(event)
-            }
-        }
-    }
-    
-    @objc func togglePopover(_ sender: Any?) {
-        if popover.isShown {
-            closePopover(sender)
-        } else {
-            showPopover(sender)
-        }
-    }
-    
-    func showPopover(_ sender: Any?) {
-        if let button = statusItem.button {
-            popover.show(relativeTo: button.bounds, of: button, preferredEdge: NSRectEdge.minY)
-            eventMonitor?.start()
-        }
-    }
-    
-    func closePopover(_ sender: Any?) {
-        popover.performClose(sender)
-        eventMonitor?.stop()
+    @objc func sliderValueChanged(_ sender: NSSlider) {
+        selectedTime = sender.doubleValue
+        timeLabel.stringValue = "\(Int(selectedTime)) min"
+        startMenuItem.isEnabled = selectedTime > 0
     }
     
     @objc func setTimerToFiveSeconds() {
@@ -151,15 +145,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         startTimer()
     }
     
-    @objc func sliderValueChanged(_ sender: NSSlider) {
-        selectedTime = sender.doubleValue
-        startMenuItem.isEnabled = selectedTime > 0
-    }
-    
     @objc func startTimer() {
         if !isTimerRunning {
-            if selectedTime > 0 {
-                timeRemaining = selectedTime * 60 // Convert minutes to seconds
+            if isTimerPaused {
+                isTimerPaused = false
+            } else {
+                if selectedTime > 0 {
+                    timeRemaining = selectedTime * 60 // Convert minutes to seconds
+                }
             }
             isTimerRunning = true
             timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
@@ -177,6 +170,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
     @objc func pauseTimer() {
         timer?.invalidate()
         isTimerRunning = false
+        isTimerPaused = true
         startMenuItem.isHidden = false
         pauseMenuItem.isHidden = true
         resetMenuItem.isHidden = false
@@ -185,19 +179,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
     @objc func resetTimer() {
         timer?.invalidate()
         isTimerRunning = false
+        isTimerPaused = false
         timeRemaining = 0
-        if let button = statusItem.button {
-            button.title = "⏱️"
-        }
-        startMenuItem.isHidden = false
-        pauseMenuItem.isHidden = true
-        resetMenuItem.isHidden = true
-        stopMenuItem.isHidden = true
-        fiveSecondsMenuItem.isHidden = false
-        fiveMinutesMenuItem.isHidden = false
-        tenMinutesMenuItem.isHidden = false
-        twentyMinutesMenuItem.isHidden = false
-        sliderMenuItem.isHidden = false
+        resetToOriginalState()
     }
     
     @objc func updateTimer() {
@@ -206,13 +190,24 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
             let minutes = Int(timeRemaining) / 60
             let seconds = Int(timeRemaining) % 60
             if let button = statusItem.button {
+                button.image = nil // Remove the icon
                 button.title = String(format: "%02d:%02d", minutes, seconds)
             }
         } else {
             timer?.invalidate()
             isTimerRunning = false
             if let button = statusItem.button {
-                button.title = "⏱️ Done!"
+                button.title = "" // Clear the title
+                if let image = NSImage(named: "icon") {
+                    image.isTemplate = true
+                    // Resize the image to a smaller size
+                    let resizedImage = NSImage(size: NSSize(width: 18, height: 18))
+                    resizedImage.lockFocus()
+                    image.draw(in: NSRect(x: 0, y: 0, width: 18, height: 18))
+                    resizedImage.unlockFocus()
+                    button.image = resizedImage
+                    button.imageScaling = .scaleProportionallyDown // Ensures the image scales down proportionally
+                }
             }
             audioPlayer?.play()
             startMenuItem.isHidden = true
@@ -234,7 +229,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
     
     func resetToOriginalState() {
         if let button = statusItem.button {
-            button.title = "⏱️"
+            button.title = "" // Clear the title
+            if let image = NSImage(named: "icon") {
+                image.isTemplate = true
+                // Resize the image to a smaller size
+                let resizedImage = NSImage(size: NSSize(width: 18, height: 18))
+                resizedImage.lockFocus()
+                image.draw(in: NSRect(x: 0, y: 0, width: 18, height: 18))
+                resizedImage.unlockFocus()
+                button.image = resizedImage
+                button.imageScaling = .scaleProportionallyDown // Ensures the image scales down proportionally
+            }
         }
         stopMenuItem.isHidden = true
         startMenuItem.isHidden = false
@@ -243,10 +248,5 @@ class AppDelegate: NSObject, NSApplicationDelegate, AVAudioPlayerDelegate {
         tenMinutesMenuItem.isHidden = false
         twentyMinutesMenuItem.isHidden = false
         sliderMenuItem.isHidden = false
-    }
-    
-    // AVAudioPlayerDelegate method
-    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        resetToOriginalState()
     }
 }
